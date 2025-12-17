@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Configuratie</title>
+    <script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 2rem;
+            color: #242424;
+        }
+        
+        .config-container {
+            max-width: 540px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #242424;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 0.875rem;
+            color: #616161;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #242424;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            font-size: 0.875rem;
+            font-family: inherit;
+            border: 1px solid #d1d1d1;
+            border-radius: 4px;
+            background: #fff;
+            color: #242424;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #5b5fc7;
+            box-shadow: 0 0 0 1px #5b5fc7;
+        }
+        
+        .form-input::placeholder {
+            color: #a0a0a0;
+        }
+        
+        .form-input.error {
+            border-color: #d13438;
+        }
+        
+        .form-input.error:focus {
+            box-shadow: 0 0 0 1px #d13438;
+        }
+        
+        .form-hint {
+            font-size: 0.75rem;
+            color: #616161;
+            margin-top: 0.375rem;
+        }
+        
+        .form-error {
+            font-size: 0.75rem;
+            color: #d13438;
+            margin-top: 0.375rem;
+            display: none;
+        }
+        
+        .form-error.visible {
+            display: block;
+        }
+        
+        .preview-section {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .preview-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #616161;
+            margin-bottom: 0.75rem;
+        }
+        
+        .preview-url {
+            font-size: 0.8125rem;
+            color: #242424;
+            word-break: break-all;
+            padding: 0.5rem 0.75rem;
+            background: #f5f5f5;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+        
+        .preview-url.empty {
+            color: #a0a0a0;
+            font-family: inherit;
+            font-style: italic;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border: 1px solid #c7d4ff;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .info-box-title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #444791;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-box-content {
+            font-size: 0.8125rem;
+            color: #444791;
+            line-height: 1.5;
+        }
+        
+        .info-icon {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .status-message {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+        
+        .status-message.success {
+            background: #dff6dd;
+            color: #107c10;
+        }
+        
+        .status-message.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="config-container">
+        <div class="header">
+            <h1>🔗 Embed Configuratie</h1>
+            <p>Voer de URL in van de content die je wilt embedden in deze tab. Dit kan een ClickUp lijst, dashboard, of andere publicly shared content zijn.</p>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="embedUrl">Embed URL</label>
+            <input 
+                type="url" 
+                id="embedUrl" 
+                class="form-input" 
+                placeholder="https://sharing.clickup.com/..."
+                autocomplete="off"
+                spellcheck="false"
+            >
+            <div class="form-hint">Plak een URL of volledige iframe code - de URL wordt automatisch geëxtraheerd</div>
+            <div class="form-error" id="urlError">Voer een geldige HTTPS URL in</div>
+        </div>
+        
+        <div class="form-group">
+            <label class="form-label" for="tabName">Tab naam (optioneel)</label>
+            <input 
+                type="text" 
+                id="tabName" 
+                class="form-input" 
+                placeholder="Bijv. Project Taken, Sprint Board..."
+                autocomplete="off"
+            >
+            <div class="form-hint">De naam die wordt getoond in de Teams tab</div>
+        </div>
+        
+        <div class="preview-section">
+            <div class="preview-header">Preview URL</div>
+            <div class="preview-url empty" id="previewUrl">Nog geen URL ingevoerd</div>
+        </div>
+        
+        <div class="info-box">
+            <div class="info-box-title">
+                <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                ClickUp Sharing
+            </div>
+            <div class="info-box-content">
+                Voor ClickUp: Open je lijst/view → klik op "Share" → enable "Public link" → kopieer de link en plak deze hierboven.
+            </div>
+        </div>
+    </div>
+    
+    <div class="status-message success" id="statusMessage">
+        ✓ Instellingen opgeslagen
+    </div>
+
+    <script>
+        (async function() {
+            const urlInput = document.getElementById('embedUrl');
+            const nameInput = document.getElementById('tabName');
+            const urlError = document.getElementById('urlError');
+            const previewUrl = document.getElementById('previewUrl');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            // Base URL for the tab page - will be updated with actual GitHub Pages URL
+            // IMPORTANT: Update this after deploying to GitHub Pages!
+            const BASE_URL = window.location.href.replace('config.html', 'tab.html');
+            
+            function isValidUrl(string) {
+                try {
+                    const url = new URL(string);
+                    return url.protocol === 'https:';
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            function extractUrlFromIframe(input) {
+                // Check if input contains an iframe tag
+                const iframeMatch = input.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+                if (iframeMatch && iframeMatch[1]) {
+                    return iframeMatch[1];
+                }
+                return input;
+            }
+            
+            function handlePaste(e) {
+                // Let the paste happen first, then process
+                setTimeout(() => {
+                    const raw = urlInput.value.trim();
+                    const extracted = extractUrlFromIframe(raw);
+                    
+                    if (extracted !== raw) {
+                        urlInput.value = extracted;
+                        showStatus('✓ URL uit iframe code gehaald');
+                    }
+                    
+                    updatePreview();
+                }, 0);
+            }
+            
+            function updatePreview() {
+                const url = urlInput.value.trim();
+                
+                if (url) {
+                    if (isValidUrl(url)) {
+                        previewUrl.textContent = url;
+                        previewUrl.classList.remove('empty');
+                        urlInput.classList.remove('error');
+                        urlError.classList.remove('visible');
+                    } else {
+                        previewUrl.textContent = 'Ongeldige URL';
+                        previewUrl.classList.add('empty');
+                        urlInput.classList.add('error');
+                        urlError.classList.add('visible');
+                    }
+                } else {
+                    previewUrl.textContent = 'Nog geen URL ingevoerd';
+                    previewUrl.classList.add('empty');
+                    urlInput.classList.remove('error');
+                    urlError.classList.remove('visible');
+                }
+                
+                updateSaveState();
+            }
+            
+            function updateSaveState() {
+                const url = urlInput.value.trim();
+                const isValid = isValidUrl(url);
+                
+                if (isValid) {
+                    microsoftTeams.pages.config.setValidityState(true);
+                } else {
+                    microsoftTeams.pages.config.setValidityState(false);
+                }
+            }
+            
+            function showStatus(message) {
+                statusMessage.textContent = message;
+                statusMessage.classList.add('visible');
+                setTimeout(() => {
+                    statusMessage.classList.remove('visible');
+                }, 2000);
+            }
+            
+            try {
+                // Initialize Teams SDK
+                await microsoftTeams.app.initialize();
+                
+                // Set up the save handler
+                microsoftTeams.pages.config.registerOnSaveHandler((saveEvent) => {
+                    const url = urlInput.value.trim();
+                    const tabName = nameInput.value.trim() || 'Embedded Content';
+                    
+                    if (!isValidUrl(url)) {
+                        saveEvent.notifyFailure('Voer een geldige HTTPS URL in');
+                        return;
+                    }
+                    
+                    const encodedUrl = encodeURIComponent(url);
+                    const contentUrl = `${BASE_URL}?url=${encodedUrl}`;
+                    
+                    microsoftTeams.pages.config.setConfig({
+                        suggestedDisplayName: tabName,
+                        entityId: `embed-tab-${Date.now()}`,
+                        contentUrl: contentUrl,
+                        websiteUrl: url
+                    });
+                    
+                    saveEvent.notifySuccess();
+                });
+                
+                // Initially disable save button
+                microsoftTeams.pages.config.setValidityState(false);
+                
+                // Listen for input changes
+                urlInput.addEventListener('input', updatePreview);
+                urlInput.addEventListener('paste', handlePaste);
+                nameInput.addEventListener('input', updateSaveState);
+                
+            } catch (e) {
+                console.log('Not running in Teams context:', e);
+                // For testing outside Teams
+                urlInput.addEventListener('input', updatePreview);
+                urlInput.addEventListener('paste', handlePaste);
+            }
+        })();
+    </script>
+</body>
+</html>

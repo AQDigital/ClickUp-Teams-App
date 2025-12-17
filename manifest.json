@@ -1,0 +1,44 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.17",
+    "version": "1.0.0",
+    "id": "{{GENERATE_NEW_GUID}}",
+    "developer": {
+        "name": "Jouw Organisatie",
+        "websiteUrl": "https://github.com",
+        "privacyUrl": "https://github.com",
+        "termsOfUseUrl": "https://github.com"
+    },
+    "name": {
+        "short": "Embed Tab",
+        "full": "Custom Embed Tab voor externe content"
+    },
+    "description": {
+        "short": "Embed externe URLs zoals ClickUp lijsten in Teams",
+        "full": "Met deze app kun je externe content embedden in een Teams tab. Perfect voor ClickUp lijsten, dashboards, en andere publicly shared content die je team direct moet kunnen inzien."
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "accentColor": "#5B5FC7",
+    "configurableTabs": [
+        {
+            "configurationUrl": "https://JOUW_GITHUB_USERNAME.github.io/teams-embed-tab/config.html",
+            "canUpdateConfiguration": true,
+            "scopes": [
+                "team",
+                "groupChat"
+            ]
+        }
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": [
+        "JOUW_GITHUB_USERNAME.github.io",
+        "*.clickup.com",
+        "sharing.clickup.com"
+    ]
+}

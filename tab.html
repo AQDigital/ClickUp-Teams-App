@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Content</title>
+    <script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+        }
+        
+        .error-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 2rem;
+            text-align: center;
+            color: #424242;
+        }
+        
+        .error-state.visible {
+            display: flex;
+        }
+        
+        .error-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1.5rem;
+            color: #d13438;
+        }
+        
+        .error-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #242424;
+        }
+        
+        .error-message {
+            font-size: 0.875rem;
+            color: #616161;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+        
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #616161;
+        }
+        
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #5b5fc7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading-state">
+            <div class="spinner"></div>
+            <span>Laden...</span>
+        </div>
+        
+        <iframe id="contentFrame" class="content-frame" style="display: none;"></iframe>
+        
+        <div id="error" class="error-state">
+            <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="error-title">Kan content niet laden</div>
+            <div class="error-message" id="errorMessage">
+                Er is geen URL geconfigureerd voor deze tab. Verwijder de tab en voeg hem opnieuw toe.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (async function() {
+            const loadingEl = document.getElementById('loading');
+            const frameEl = document.getElementById('contentFrame');
+            const errorEl = document.getElementById('error');
+            const errorMessageEl = document.getElementById('errorMessage');
+            
+            function showError(message) {
+                loadingEl.style.display = 'none';
+                frameEl.style.display = 'none';
+                errorMessageEl.textContent = message;
+                errorEl.classList.add('visible');
+            }
+            
+            function showFrame(url) {
+                loadingEl.style.display = 'none';
+                errorEl.classList.remove('visible');
+                frameEl.src = url;
+                frameEl.style.display = 'block';
+            }
+            
+            try {
+                // Initialize Teams SDK
+                await microsoftTeams.app.initialize();
+                
+                // Get the context to retrieve settings
+                const context = await microsoftTeams.app.getContext();
+                
+                // Get the saved settings
+                microsoftTeams.pages.getConfig().then((settings) => {
+                    const url = settings.contentUrl ? new URL(settings.contentUrl).searchParams.get('url') : null;
+                    
+                    if (url) {
+                        showFrame(decodeURIComponent(url));
+                    } else {
+                        // Try getting URL from query string directly (fallback)
+                        const params = new URLSearchParams(window.location.search);
+                        const directUrl = params.get('url');
+                        
+                        if (directUrl) {
+                            showFrame(decodeURIComponent(directUrl));
+                        } else {
+                            showError('Er is geen URL geconfigureerd voor deze tab. Verwijder de tab en voeg hem opnieuw toe.');
+                        }
+                    }
+                }).catch(() => {
+                    // Fallback: try query string
+                    const params = new URLSearchParams(window.location.search);
+                    const url = params.get('url');
+                    
+                    if (url) {
+                        showFrame(decodeURIComponent(url));
+                    } else {
+                        showError('Er is geen URL geconfigureerd voor deze tab.');
+                    }
+                });
+                
+            } catch (e) {
+                // Not in Teams context, try query string
+                const params = new URLSearchParams(window.location.search);
+                const url = params.get('url');
+                
+                if (url) {
+                    showFrame(decodeURIComponent(url));
+                } else {
+                    showError('Deze pagina moet binnen Microsoft Teams worden geopend.');
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
