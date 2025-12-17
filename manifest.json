@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
     "manifestVersion": "1.17",
     "version": "1.0.0",
-    "id": "{{GENERATE_NEW_GUID}}",
+    "id": "40918a39-697d-4a22-a188-33919eea546d",
     "developer": {
         "name": "Jouw Organisatie",
         "websiteUrl": "https://github.com",
@@ -24,7 +24,7 @@
     "accentColor": "#5B5FC7",
     "configurableTabs": [
         {
-            "configurationUrl": "https://JOUW_GITHUB_USERNAME.github.io/teams-embed-tab/config.html",
+            "configurationUrl": "https://aqdigital.github.io/ClickUp-Teams-App/config.html",
             "canUpdateConfiguration": true,
             "scopes": [
                 "team",
@@ -37,8 +37,9 @@
         "messageTeamMembers"
     ],
     "validDomains": [
-        "JOUW_GITHUB_USERNAME.github.io",
+        "aqdigital.github.io",
         "*.clickup.com",
         "sharing.clickup.com"
     ]
 }
+ 
