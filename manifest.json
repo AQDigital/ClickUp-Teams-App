@@ -27,8 +27,9 @@
             "configurationUrl": "https://aqdigital.github.io/ClickUp-Teams-App/config.html",
             "canUpdateConfiguration": true,
             "scopes": [
+                "personal",
                 "team",
-                "groupChat"
+                "groupchat"
             ]
         }
     ],
